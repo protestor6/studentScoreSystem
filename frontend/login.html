@@ -1,0 +1,201 @@
+<!--made by 叶永盛-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统登录</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      background-color: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 420px;
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .form-item {
+      margin-bottom: 20px;
+    }
+
+    .form-item label {
+      display: block;
+      margin-bottom: 8px;
+      color: #555;
+      font-size: 14px;
+    }
+
+    .form-item input {
+      width: 100%;
+      height: 44px;
+      padding: 0 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 15px;
+      outline: none;
+      transition: border 0.3s;
+    }
+
+    .form-item input:focus {
+      border-color: #409eff;
+    }
+
+    /* 验证码行 */
+    .captcha-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .captcha-row input {
+      flex: 1;
+    }
+
+    .captcha-img {
+      height: 44px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+    }
+
+    .login-btn {
+      width: 100%;
+      height: 46px;
+      background-color: #409eff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      background-color: #338eef;
+    }
+
+    .tips {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-title">用户登录</div>
+    <form id="loginForm">
+      <div class="form-item">
+        <label>用户名</label>
+        <input type="text" name="username" placeholder="请输入用户名" required>
+      </div>
+      <div class="form-item">
+        <label>密码</label>
+        <input type="password" name="password" placeholder="请输入密码" required>
+      </div>
+      <div class="form-item">
+        <label>验证码</label>
+        <div class="captcha-row">
+          <input type="text" name="captcha" placeholder="请输入验证码" required>
+          <!-- 验证码图片：src 指向后端接口，点击刷新 -->
+          <img 
+            id="captchaImg" 
+            src="/api/captcha" 
+            class="captcha-img" 
+            alt="验证码"
+            title="点击刷新验证码"
+          >
+        </div>
+      </div>
+      <button type="submit" class="login-btn">登录</button>
+    </form>
+    <div class="tips">欢迎使用管理系统</div>
+  </div>
+
+  <script>
+    // 1. 点击验证码图片刷新（替换箭头函数为普通函数）
+    var captchaImg = document.getElementById('captchaImg');
+    captchaImg.addEventListener('click', refreshCaptcha);
+
+    // 刷新验证码（加时间戳防止浏览器缓存）
+    function refreshCaptcha() {
+      captchaImg.src = '/api/captcha?time=' + new Date().getTime();
+    }
+
+    // 2. 表单提交登录（替换 async/await 和箭头函数，改用传统的 XMLHttpRequest）
+    var loginForm = document.getElementById('loginForm');
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault(); // 阻止默认刷新
+
+      var formData = {
+        username: loginForm.username.value.trim(),
+        password: loginForm.password.value.trim(),
+        captcha: loginForm.captcha.value.trim()
+      };
+
+      // 简单验证
+      if (!formData.username || !formData.password || !formData.captcha) {
+        alert('请填写完整信息');
+        return;
+      }
+
+      // 发送登录请求到后端（改用兼容所有浏览器的 XMLHttpRequest）
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/login', true);
+      xhr.setRequestHeader('Content-Type', 'application/json');
+      
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            try {
+              var result = JSON.parse(xhr.responseText);
+              if (result.code === 200) {
+                alert('登录成功');
+                // 登录成功后跳转
+                // location.href = '/home';
+              } else {
+                alert(result.msg || '登录失败');
+                // 登录失败自动刷新验证码
+                refreshCaptcha();
+              }
+            } catch (err) {
+              alert('返回数据格式错误');
+              refreshCaptcha();
+            }
+          } else {
+            alert('网络异常，请重试');
+            refreshCaptcha();
+          }
+        }
+      };
+      
+      xhr.send(JSON.stringify(formData));
+    });
+  </script>
+</body>
+</html>
