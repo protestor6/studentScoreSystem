@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学生成绩系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background-color: #f5f7fa;
+        }
+        /* 整体布局 */
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        /* 左侧边栏 */
+        .sidebar {
+            width: 200px;
+            background-color: #fff;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            height: 50px;
+            background: linear-gradient(to right, #4080ff, #69b1ff);
+        }
+        .sidebar-menu {
+            flex: 1;
+            padding-top: 10px;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .menu-item.active {
+            background-color: #eaf2ff;
+            color: #4080ff;
+            border-right: 3px solid #4080ff;
+        }
+        .menu-item:hover {
+            background-color: #f0f5ff;
+        }
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 顶部导航栏 */
+        .top-bar {
+            height: 60px;
+            background-color: #fff;
+            border-bottom: 1px solid #e8e8e8;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 30px;
+        }
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .logout-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .logout-link:hover {
+            color: #4080ff;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        .user-name {
+            font-size: 15px;
+            color: #333;
+        }
+        /* 成绩查询区域通用样式 */
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .query-header {
+            background-color: #eaf5ff;
+            padding: 12px 15px;
+            border-radius: 4px 4px 0 0;
+            font-size: 15px;
+            color: #333;
+        }
+        .query-form {
+            background-color: #fff;
+            padding: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .form-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-item label {
+            font-size: 14px;
+            color: #333;
+        }
+        .form-item select,
+        .form-item input {
+            padding: 6px 10px;
+            border: 1px solid #dcdfe6;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        /* 排序复选框样式 */
+        .sort-checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .sort-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            color: #333;
+        }
+        .sort-checkbox-item input {
+            min-width: auto;
+            cursor: pointer;
+        }
+        .btn-group {
+            margin-left: 10px;
+        }
+        .btn {
+            padding: 7px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-search {
+            background-color: #4080ff;
+            color: #fff;
+        }
+        /* 表格通用样式 */
+        .table-area {
+            background-color: #fff;
+        }
+        .table-info {
+            padding: 10px 20px;
+            font-size: 13px;
+            color: #666;
+        }
+        .result-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .result-table th,
+        .result-table td {
+            border: 1px solid #ebeef5;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .result-table th {
+            background-color: #fafafa;
+            color: #606266;
+            font-weight: normal;
+        }
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            color: #909399;
+        }
+
+        /* 学业统计查询专属样式 */
+        .stat-container {
+            background-color: #fff;
+            display: flex;
+            min-height: calc(100% - 40px);
+        }
+        /* 左侧指标区域 */
+        .stat-metrics {
+            width: 250px;
+            padding: 20px;
+            border-right: 1px solid #e8e8e8;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .metric-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4080ff;
+        }
+        /* 右侧表格区域 */
+        .stat-table-area {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header"></div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="switchTab('score')">
+                    成绩查询
+                </div>
+                <div class="menu-item" onclick="switchTab('stat')">
+                    学业统计查询
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 顶部栏 -->
+            <div class="top-bar">
+                <div class="top-bar-right">
+                    <a href="login.html" class="logout-link" onclick="return confirm('确定要退出登录吗？')">退出登录</a>
+                    <div class="user-avatar">👤</div>
+                    <div class="user-name">叶永盛</div>
+                </div>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="content-area">
+                <!-- 成绩查询模块 -->
+                <div id="score-module">
+                    <div class="query-header">课程成绩查询</div>
+                    <div class="query-form">
+                        <!-- 学期下拉框（逆序排列：最新→最旧） -->
+                        <div class="form-item">
+                            <label>学期</label>
+                            <select>
+                                <option>2026-2027-2</option>
+                                <option>2026-2027-1</option>
+                                <option>2025-2026-1</option>
+                                <option selected>2025-2026-2</option>
+                                <option>2024-2025-2</option>
+                                <option>2024-2025-1</option>
+                                <option>2023-2024-2</option>
+                                <option>2023-2024-1</option>
+                                <option>2022-2023-2</option>
+                                <option>2022-2023-1</option>
+                            </select>
+                        </div>
+                        <!-- 课程名称输入框 -->
+                        <div class="form-item">
+                            <label>课程名称</label>
+                            <input type="text" placeholder="请输入课程名称">
+                        </div>
+                        <!-- 课程编号输入框 -->
+                        <div class="form-item">
+                            <label>课程编号</label>
+                            <input type="text" placeholder="请输入课程编号">
+                        </div>
+                        <!-- 新增：排序复选框组（互斥） -->
+                        <div class="sort-checkbox-group">
+                            <div class="sort-checkbox-item">
+                                <input type="checkbox" id="sortDesc" value="desc" onchange="handleSortCheckbox(this)">
+                                <label for="sortDesc">按成绩降序</label>
+                            </div>
+                            <div class="sort-checkbox-item">
+                                <input type="checkbox" id="sortAsc" value="asc" onchange="handleSortCheckbox(this)">
+                                <label for="sortAsc">按成绩升序</label>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-search" onclick="queryScore()">查询</button>
+                        </div>
+                    </div>
+                    <div class="table-area">
+                        <div class="table-info">查询条件: 学期【2025-2026-2】</div>
+                        <table class="result-table">
+                            <thead>
+                                <tr>
+                                    <th>序号</th>
+                                    <th>开课学期</th>
+                                    <th>课程编号</th>
+                                    <th>课程名称</th>
+                                    <th>成绩</th>
+                                    <th>学分</th>
+                                    <th>总学时</th>
+                                    <th>绩点</th>
+                                    <th>考核方式</th>
+                                    <th>课程类型</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scoreTableBody">
+                                <tr>
+                                    <td colspan="10" class="no-data">未查询到数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 学业统计查询模块（完善版） -->
+                <div id="stat-module" style="display: none;">
+                    <div class="query-header">学业统计查询</div>
+                    <div class="stat-container">
+                        <!-- 左侧学业指标区域 -->
+                        <div class="stat-metrics">
+                            <div class="metric-item">
+                                <div class="metric-label">个人总绩点</div>
+                                <div class="metric-value" id="totalGpa">3.78</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">平均学分绩点</div>
+                                <div class="metric-value" id="avgGpa">3.65</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">已修学分</div>
+                                <div class="metric-value" id="completedCredits">89</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">未修学分</div>
+                                <div class="metric-value" id="uncompletedCredits">21</div>
+                            </div>
+                            <div class="metric-item">
+                                <div class="metric-label">学业进度</div>
+                                <div class="metric-value" id="studyProgress">81/100 (81%)</div>
+                            </div>
+                        </div>
+
+                        <!-- 右侧学业统计表格 -->
+                        <div class="stat-table-area">
+                            <table class="result-table">
+                                <thead>
+                                    <tr>
+                                        <th>序号</th>
+                                        <th>课程编号</th>
+                                        <th>课程名称</th>
+                                        <th>学分</th>
+                                        <th>成绩</th>
+                                        <th>绩点</th>
+                                        <th>修读状态</th>
+                                        <th>修读学期</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="statTableBody">
+                                    <!-- 数据从JS动态填充 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 模拟成绩数据
+        const scoreData = [
+            { id: 1, term: "2025-2026-2", code: "CS301", name: "操作系统", score: 92, credit: 3, totalHour: 48, gpa: 4.0, examType: "考试", courseType: "专业核心课" },
+            { id: 2, term: "2025-2026-2", code: "CS302", name: "计算机网络", score: 85, credit: 3, totalHour: 48, gpa: 3.5, examType: "考试", courseType: "专业核心课" },
+            { id: 3, term: "2025-2026-2", code: "MA201", name: "概率论", score: 88, credit: 2, totalHour: 32, gpa: 3.7, examType: "考试", courseType: "公共基础课" }
+        ];
+
+        // 模拟从数据库读取的学业数据
+        const studentStudyData = {
+            totalGpa: 3.78,
+            avgGpa: 3.65,
+            completedCredits: 89,
+            uncompletedCredits: 21,
+            completedCourses: 81,
+            totalCourses: 100,
+            courseList: [
+                { id: 1, code: "CS101", name: "计算机基础", credit: 3, score: 92, gpa: 4.0, status: "已修", term: "2022-2023-1" },
+                { id: 2, code: "MA102", name: "高等数学(上)", credit: 4, score: 88, gpa: 3.7, status: "已修", term: "2022-2023-1" },
+                { id: 3, code: "EN101", name: "大学英语(一)", credit: 2, score: 85, gpa: 3.5, status: "已修", term: "2022-2023-1" },
+                { id: 4, code: "CS201", name: "数据结构", credit: 4, score: 90, gpa: 3.9, status: "已修", term: "2023-2024-1" },
+                { id: 5, code: "CS301", name: "操作系统", credit: 3, score: 0, gpa: 0, status: "未修", term: "2025-2026-2" },
+                { id: 6, code: "CS302", name: "计算机网络", credit: 3, score: 0, gpa: 0, status: "未修", term: "2025-2026-2" }
+            ]
+        };
+
+        // 页面加载时初始化
+        window.onload = function() {
+            initStatData();
+        };
+
+        // 处理排序复选框互斥逻辑
+        function handleSortCheckbox(checkbox) {
+            const descCheckbox = document.getElementById("sortDesc");
+            const ascCheckbox = document.getElementById("sortAsc");
+            
+            // 如果当前复选框被选中，取消另一个的选中状态
+            if (checkbox.checked) {
+                if (checkbox.id === "sortDesc") {
+                    ascCheckbox.checked = false;
+                } else {
+                    descCheckbox.checked = false;
+                }
+            }
+        }
+
+        // 成绩查询函数（含排序逻辑）
+        function queryScore() {
+            const tableBody = document.getElementById("scoreTableBody");
+            // 清空原有数据
+            tableBody.innerHTML = "";
+
+            // 获取排序方式（降序/升序/默认）
+            const descChecked = document.getElementById("sortDesc").checked;
+            const ascChecked = document.getElementById("sortAsc").checked;
+            
+            // 复制数据
+            let sortedData = [...scoreData];
+            
+            // 根据复选框状态排序
+            if (descChecked) {
+                // 降序：成绩高的在前
+                sortedData.sort((a, b) => b.score - a.score);
+            } else if (ascChecked) {
+                // 升序：成绩低的在前
+                sortedData.sort((a, b) => a.score - b.score);
+            }
+            // 都不选则使用原始默认顺序
+
+            // 填充表格
+            if (sortedData.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="10" class="no-data">未查询到数据</td></tr>`;
+                return;
+            }
+
+            sortedData.forEach((item, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.term}</td>
+                    <td>${item.code}</td>
+                    <td>${item.name}</td>
+                    <td>${item.score}</td>
+                    <td>${item.credit}</td>
+                    <td>${item.totalHour}</td>
+                    <td>${item.gpa}</td>
+                    <td>${item.examType}</td>
+                    <td>${item.courseType}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 初始化学业统计数据
+        function initStatData() {
+            document.getElementById("totalGpa").textContent = studentStudyData.totalGpa;
+            document.getElementById("avgGpa").textContent = studentStudyData.avgGpa;
+            document.getElementById("completedCredits").textContent = studentStudyData.completedCredits;
+            document.getElementById("uncompletedCredits").textContent = studentStudyData.uncompletedCredits;
+            const progressText = `${studentStudyData.completedCourses}/${studentStudyData.totalCourses} (${(studentStudyData.completedCourses/studentStudyData.totalCourses*100).toFixed(0)}%)`;
+            document.getElementById("studyProgress").textContent = progressText;
+
+            const tableBody = document.getElementById("statTableBody");
+            if (studentStudyData.courseList.length === 0) {
+                const emptyRow = document.createElement("tr");
+                emptyRow.innerHTML = `<td colspan="8" class="no-data">暂无学业统计数据</td>`;
+                tableBody.appendChild(emptyRow);
+                return;
+            }
+
+            studentStudyData.courseList.forEach(course => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${course.id}</td>
+                    <td>${course.code}</td>
+                    <td>${course.name}</td>
+                    <td>${course.credit}</td>
+                    <td>${course.score}</td>
+                    <td>${course.gpa}</td>
+                    <td>${course.status}</td>
+                    <td>${course.term}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // 切换菜单
+        function switchTab(type) {
+            document.querySelectorAll('.menu-item').forEach((item, index) => {
+                if ((type === 'score' && index === 0) || (type === 'stat' && index === 1)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            document.getElementById('score-module').style.display = type === 'score' ? 'block' : 'none';
+            document.getElementById('stat-module').style.display = type === 'stat' ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>
