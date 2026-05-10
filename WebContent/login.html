@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>学生成绩管理系统 - 登录</title>
+    <style>
+        body{text-align:center;margin-top:100px;}
+        .login-box{width:350px;margin:0 auto;padding:20px;border:1px solid #ccc;border-radius:5px;}
+        input{width:250px;height:30px;margin:8px 0;padding-left:5px;}
+        button{width:260px;height:35px;background:#409eff;color:white;border:none;border-radius:3px;cursor:pointer;}
+        .captcha-box{display:flex;align-items:center;justify-content:center;gap:5px;}
+        .captcha-img{height:34px;cursor:pointer;}
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>登录</h2>
+        
+        <!-- 关键：action="/项目名/login" 你直接用下面这个 -->
+        <form action="login" method="post">
+            <input type="text" name="uno" placeholder="请输入账号" required><br>
+            <input type="password" name="password" placeholder="请输入密码" required><br>
+            
+            <div class="captcha-box">
+                <input type="text" name="captcha" placeholder="请输入验证码" required>
+                <!-- 验证码图片：自动连接后端 CaptchaServlet -->
+                <img src="api/captcha" class="captcha-img" id="captchaImg" onclick="refreshCaptcha()">
+            </div>
+
+            <button type="submit" style="margin-top:10px">登录</button>
+        </form>
+    </div>
+
+    <script>
+        // 点击刷新验证码
+        function refreshCaptcha() {
+            let img = document.getElementById("captchaImg");
+            img.src = "api/captcha?t=" + new Date().getTime();
+        }
+    </script>
+</body>
+</html>
