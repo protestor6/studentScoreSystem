@@ -4,9 +4,6 @@ package com.sss.entity;
  * 用户实体类（对应数据库 users 表）
  * 用于登录功能
  */
-enum UserType{
-	学生,教师,管理员
-}
 
 public class Users {
     private int id;          // 主键id
@@ -17,16 +14,6 @@ public class Users {
 
     // 无参构造
     public Users() {}
-
-    public Users(int id, UserType utype, String uno, String password,
-			Integer admno) {
-		super();
-		this.id = id;
-		this.utype = utype;
-		this.uno = uno;
-		this.password = password;
-		this.admno = admno;
-	}
 
 	// get & set
     public int getId() {
