@@ -1,3 +1,4 @@
+//made by Ò¶ÓÀÊ¢
 package com.sss.entity;
 
 public enum UserType {

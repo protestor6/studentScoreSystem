@@ -1,3 +1,4 @@
+//made by “∂”¿ ¢
 package com.sss.util;
 
 import java.awt.Color;

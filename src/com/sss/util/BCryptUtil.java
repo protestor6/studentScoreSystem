@@ -1,3 +1,4 @@
+//made by “∂”¿ ¢
 package com.sss.util;
 
 import org.mindrot.jbcrypt.BCrypt;
