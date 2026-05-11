@@ -52,7 +52,7 @@ public class UsersServiceImpl implements UsersService {
             long now = System.currentTimeMillis();
             long unlockTime = lockTime.getTime() + (long) lockMin * 60 * 1000;
             if (now < unlockTime) {
-                long remainMin = (unlockTime - now) / 1000 / 60;
+                long remainMin = (long)Math.ceil(1.0*(unlockTime - now) / 1000 / 60);
                 return "账号已锁定，剩余 " + remainMin + " 分钟后解锁";
             }
         }

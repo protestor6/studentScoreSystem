@@ -62,7 +62,12 @@ public class LoginServlet extends HttpServlet {
             userService.handleLoginFail(uno);
             String msg=URLEncoder.encode("账号或密码错误！", "UTF-8");;
             int errorCount = usersDao.getUserByUno(uno).getErrorCount();
-            if(errorCount>=2&&errorCount<5)
+            if(errorCount>=11)
+            	msg=URLEncoder.encode("账号或密码错误！账号已永久锁定，请联系管理员解锁", "UTF-8");
+            else if(errorCount>=5)
+            	msg=URLEncoder.encode("账号或密码错误！账号已锁定，"
+            			+(int)Math.pow(2, errorCount-5)+"分钟后解锁", "UTF-8");
+            else if(errorCount>=2)
             	msg=URLEncoder.encode("账号或密码错误！你还有"+(5-errorCount)+"次机会"
             			, "UTF-8");;
             response.sendRedirect("login.html?Msg="+msg);
