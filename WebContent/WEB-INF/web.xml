@@ -9,7 +9,6 @@
 
     <!-- 欢迎页配置 -->
     <welcome-file-list>
-        <welcome-file>login.html</welcome-file>
     </welcome-file-list>
 
     <!-- LoginServlet 配置 -->

@@ -19,29 +19,53 @@ public class LoginFilter implements Filter {
         String uri = request.getRequestURI();
         String ctx = request.getContextPath();
 
-        // 拿到登录用户
         Users loginUser = (Users) session.getAttribute("loginUser");
 
-        // ========== 放行无需登录的资源 ==========
-        boolean isStatic = uri.contains("/css/") 
-                        || uri.contains("/js/") 
-                        || uri.contains("/img/");
+        // ==============================================
+        // 已登录 → 访问 根路径 / 或 login.html → 都跳学生页
+        // ==============================================
+        boolean isRootPath = uri.equals(ctx + "/");
         boolean isLoginPage = uri.endsWith("login.html");
+
+        if (loginUser != null) {
+            if (isRootPath || isLoginPage) {
+            	if(loginUser.getUtype()==UserType.学生)
+                	response.sendRedirect(ctx + "/pages/student.html");
+                return;
+            }
+        }
+
+        // ==============================================
+        // 未登录 → 访问根路径 / → 直接显示登录页
+        // ==============================================
+        if (loginUser == null) {
+            if (isRootPath) {
+                request.getRequestDispatcher("/login.html").forward(request, response);
+                return;
+            }
+        }
+
+        // ==============================================
+        // 放行不需要登录的资源
+        // ==============================================
+        boolean isStatic = uri.contains("/css/") || uri.contains("/js/") || uri.contains("/img/");
         boolean isLoginServlet = uri.endsWith("login");
+        boolean isLogout = uri.endsWith("logout");
         boolean isCaptcha = uri.contains("captcha");
 
-        if (isStatic || isLoginPage || isLoginServlet || isCaptcha) {
+        if (isStatic || isLoginPage || isLoginServlet || isLogout || isCaptcha) {
             chain.doFilter(request, response);
             return;
         }
 
-        // ========== 未登录拦截 ==========
+        // ==============================================
+        // 未登录访问其他页面 → 跳登录
+        // ==============================================
         if (loginUser == null) {
             response.sendRedirect(ctx + "/login.html");
             return;
         }
 
-        // 已登录正常放行
         chain.doFilter(request, response);
     }
 
