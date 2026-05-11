@@ -1,12 +1,16 @@
 package com.sss.servlet;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.sss.dao.UsersDao;
+import com.sss.dao.impl.UsersDaoImpl;
 import com.sss.entity.Users;
 import com.sss.service.UsersService;
 import com.sss.service.impl.UsersServiceImpl;
@@ -15,6 +19,7 @@ import com.sss.util.XssUtil;
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     private UsersService userService = new UsersServiceImpl();
+    private UsersDao usersDao = new UsersDaoImpl();
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -37,14 +42,16 @@ public class LoginServlet extends HttpServlet {
         // 1. 验证码错误：不计入锁定
         if (inputCaptcha == null || sessionCaptcha == null
                 || !inputCaptcha.equalsIgnoreCase(sessionCaptcha)) {
-            response.getWriter().write("<script>alert('验证码错误');history.back();</script>");
+        	String msg = URLEncoder.encode("验证码错误！", "UTF-8");
+            response.sendRedirect("login.html?Msg=" + msg);
             return;
         }
 
         // 2. 先检查账号是否锁定
         String lockMsg = userService.checkAccountLock(uno);
         if (lockMsg != null) {
-            response.getWriter().write("<script>alert('" + lockMsg + "');history.back();</script>");
+        	String msg = URLEncoder.encode(lockMsg, "UTF-8");
+            response.sendRedirect("login.html?Msg=" + msg);
             return;
         }
 
@@ -53,7 +60,12 @@ public class LoginServlet extends HttpServlet {
         if (user == null) {
             // 账号密码错误：触发计数和锁定
             userService.handleLoginFail(uno);
-            response.getWriter().write("<script>alert('账号或密码错误');history.back();</script>");
+            String msg=URLEncoder.encode("账号或密码错误！", "UTF-8");;
+            int errorCount = usersDao.getUserByUno(uno).getErrorCount();
+            if(errorCount>=2&&errorCount<5)
+            	msg=URLEncoder.encode("账号或密码错误！你还有"+(5-errorCount)+"次机会"
+            			, "UTF-8");;
+            response.sendRedirect("login.html?Msg="+msg);
             return;
         }
 
