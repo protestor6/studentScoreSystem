@@ -22,10 +22,10 @@ public class DBUtil {
     static {
         try {
             Class.forName(DRIVER);
-//            System.out.println("MySQL驱动加载成功！");
+            System.out.println("MySQL驱动加载成功！");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-//            System.out.println("MySQL驱动加载失败！请检查jar包是否导入");
+            System.out.println("MySQL驱动加载失败！请检查jar包是否导入");
         }
     }
 
@@ -37,10 +37,10 @@ public class DBUtil {
         Connection conn = null;
         try {
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-//            System.out.println("成功连接到SSSdatabase数据库！");
+            System.out.println("成功连接到SSSdatabase数据库！");
         } catch (SQLException e) {
             e.printStackTrace();
-//            System.out.println("数据库连接失败！请检查账号密码/数据库名/编码配置");
+            System.out.println("数据库连接失败！请检查账号密码/数据库名/编码配置");
         }
         return conn;
     }

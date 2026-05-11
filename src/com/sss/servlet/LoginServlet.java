@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import com.sss.entity.Users;
 import com.sss.service.UsersService;
 import com.sss.service.impl.UsersServiceImpl;
+import com.sss.util.XssUtil;
 
 public class LoginServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -20,10 +21,14 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
         response.setContentType("text/html;charset=utf-8");
-
-        String uno = request.getParameter("uno");
-        String password = request.getParameter("password");
-        String inputCaptcha = request.getParameter("captcha");
+        response.setHeader("X-XSS-Protection", "1;mode=block");//·ÀXSS½Å±¾¹¥»÷
+        response.setHeader("X-Content-Type-Options", "nosniff");//·ÀMIMEÐáÌ½
+        response.setHeader("X-Frame-Options", "DENY");//·ÀiframeÇ¶Ì×
+        response.setHeader("Content-Security-Policy", "default-src 'self'");//·À·Ç·¨½Å±¾Ö´ÐÐ
+        
+        String uno = XssUtil.escape(request.getParameter("uno").trim());
+        String password = XssUtil.escape(request.getParameter("password").trim());
+        String inputCaptcha = XssUtil.escape(request.getParameter("captcha")).trim();
 
         HttpSession session = request.getSession();
         String sessionCaptcha = (String) session.getAttribute("captchaCode");

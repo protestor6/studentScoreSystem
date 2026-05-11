@@ -18,8 +18,8 @@
         
         <!-- 关键：action="/项目名/login" 你直接用下面这个 -->
         <form action="login" method="post">
-            <input type="text" name="uno" placeholder="请输入账号" required><br>
-            <input type="password" name="password" placeholder="请输入密码" required><br>
+            <input type="text" name="uno" maxlength="20" pattern="^[A-Za-z0-9]+$" placeholder="请输入账号" required><br>
+            <input type="password" name="password" maxlength="20" pattern="^[A-Za-z0-9_]+$" placeholder="请输入密码" required><br>
             
             <div class="captcha-box">
                 <input type="text" name="captcha" placeholder="请输入验证码" required>
