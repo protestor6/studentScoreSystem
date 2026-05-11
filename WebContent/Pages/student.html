@@ -252,7 +252,7 @@
             <!-- 顶部栏 -->
             <div class="top-bar">
                 <div class="top-bar-right">
-                    <a href="/studentScoreSystem/logout" class="logout-link" onclick="return confirm('确定要退出登录吗？')">退出登录</a>
+                    <a href="javascript:void(0)" class="logout-link" onclick="confirmLogout()">退出登录</a>
                     <div class="user-avatar">👤</div>
                     <div class="user-name">叶永盛</div>
                 </div>
@@ -430,7 +430,14 @@
                 }
             }
         }
-
+        
+		function confirmLogout() {
+		    if (confirm("确定要退出登录吗？")) {
+		        // 确认后再跳转
+		        window.location.href = "/studentScoreSystem/logout";
+		    }
+		}
+		
         // 成绩查询函数（含排序逻辑）
         function queryScore() {
             const tableBody = document.getElementById("scoreTableBody");

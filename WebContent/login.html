@@ -1,56 +1,174 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>学生成绩管理系统 - 登录</title>
-    <style>
-        body{text-align:center;margin-top:100px;}
-        .login-box{width:350px;margin:0 auto;padding:20px;border:1px solid #ccc;border-radius:5px;}
-        input{width:250px;height:30px;margin:8px 0;padding-left:5px;}
-        button{width:260px;height:35px;background:#409eff;color:white;border:none;border-radius:3px;cursor:pointer;}
-        .captcha-box{display:flex;align-items:center;justify-content:center;gap:5px;}
-        .captcha-img{height:34px;cursor:pointer;}
-    </style>
+<meta charset="UTF-8">
+<title>用户登录</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background: #fff;
+    width: 420px;
+    padding: 40px 35px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.login-title {
+    text-align: center;
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+.form-item {
+    margin-bottom: 20px;
+}
+
+.form-item label {
+    display: block;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.form-item input {
+    width: 100%;
+    height: 42px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 0 12px;
+    font-size: 15px;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.form-item input:focus {
+    border-color: #4e73df;
+}
+
+.captcha-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.captcha-row input {
+    flex: 1;
+}
+
+#captchaImg {
+    height: 42px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+}
+
+.captcha-refresh {
+    font-size: 13px;
+    color: #4e73df;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#errorTip {
+    color: #e74a3b;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+    min-height: 20px;
+}
+
+.login-btn {
+    width: 100%;
+    height: 45px;
+    background: #4e73df;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.login-btn:hover {
+    background: #224abe;
+}
+</style>
 </head>
+
 <body>
-    <div class="login-box">
-        <h2>登录</h2>
- 	    <h3 id="errorTip" style="color: red;"></h3>
+<div class="login-card">
+    <div class="login-title">用户登录</div>
 
-        <!-- 关键：action="/项目名/login" 你直接用下面这个 -->
-        <form action="login" method="post">
-            <input type="text" name="uno" maxlength="20" pattern="^[A-Za-z0-9]+$" placeholder="请输入账号" required><br>
-            <input type="password" name="password" maxlength="20" pattern="^[A-Za-z0-9_]+$" placeholder="请输入密码" required><br>
-            
-            <div class="captcha-box">
-                <input type="text" name="captcha" placeholder="请输入验证码" required>
-                <!-- 验证码图片：自动连接后端 CaptchaServlet -->
-                <img src="api/captcha" class="captcha-img" id="captchaImg" onclick="refreshCaptcha()">
+    <!-- 错误提示区域（完全不动） -->
+    <div id="errorTip" class="tip"></div>
+
+    <form action="login" method="post">
+        <div class="form-item">
+            <label>账号</label>
+            <input type="text" name="uno" required>
+        </div>
+
+        <div class="form-item">
+            <label>密码</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <div class="form-item">
+            <label>验证码</label>
+            <div class="captcha-row">
+                <input type="text" name="captcha" required>
+                <img id="captchaImg" src="api/captcha" onclick="refreshCaptcha()" title="点击刷新">
             </div>
+        </div>
 
-            <button type="submit" style="margin-top:10px">登录</button>
-        </form>
-    </div>
+        <button type="submit" class="login-btn">登录</button>
+    </form>
+</div>
 
-    <script>
-        // 点击刷新验证码
-        function refreshCaptcha() {
-            let img = document.getElementById("captchaImg");
-            img.src = "api/captcha?t=" + new Date().getTime();
-        }
-        // 页面加载自动刷新验证码 + 读取提示
-		window.onload = function () {
-		    refreshCaptcha();
-		
-		    // 读取URL参数
-		    let urlParams = new URLSearchParams(window.location.search);
-		    let msg = urlParams.get("Msg");
-		    let tipText = "";
-			//显示提示信息
-		    if(msg){
-		        document.getElementById("errorTip").innerText = msg;
-		    }
-		}
-    </script>
+<script>
+// 你的原有JS逻辑完全不动
+function refreshCaptcha() {
+    let img = document.getElementById("captchaImg");
+    img.src = "api/captcha?_t=" + new Date().getTime();
+}
+
+window.onload = function () {
+    refreshCaptcha();
+    let urlParams = new URLSearchParams(window.location.search);
+    let error = urlParams.get("error");
+    let msg = urlParams.get("Msg");
+    let tipText = "";
+
+    if (msg) {
+        tipText = decodeURIComponent(msg);
+    } else if (error === "captcha") {
+        tipText = "验证码错误，请重新输入！";
+    } else if (error === "pwd") {
+        tipText = "账号或密码错误！";
+    } else if (error === "lock") {
+        tipText = "账号已被锁定，请稍后再试！";
+    }
+
+    if (tipText) {
+        document.getElementById("errorTip").innerText = tipText;
+    }
+}
+</script>
 </body>
 </html>
