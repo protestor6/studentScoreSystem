@@ -1,7 +1,6 @@
 package com.sss.entity;
 
 import java.util.Date;
-
 /**
  * 用户实体类
  * 已集成：登录错误计数 + 锁定字段，不用额外建表

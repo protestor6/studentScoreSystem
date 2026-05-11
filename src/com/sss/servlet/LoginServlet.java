@@ -76,7 +76,10 @@ public class LoginServlet extends HttpServlet {
 
         // 4. 登录成功：清空错误计数和锁定状态
         userService.handleLoginSuccess(uno);
+        session.removeAttribute("captchaCode");
         session.setAttribute("loginUser", user);
-        response.sendRedirect("pages/student.html");
+        System.out.println("登录成功，用户信息：" + user + "，Session ID：" + session.getId());
+        // 这里用request.getContextPath()获取项目根路径，确保跳转正确
+        response.sendRedirect(request.getContextPath() + "/pages/student.html");
     }
 }
