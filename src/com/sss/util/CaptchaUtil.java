@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * 验证码生成工具类
@@ -12,7 +12,7 @@ import java.util.Random;
  */
 public class CaptchaUtil {
     // 验证码字符集：大小写字母+数字
-    private static final String CODES = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final String CODES = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
     private static final int CODE_LENGTH = 4; // 4位验证码
     private static final int WIDTH = 120;     // 图片宽度
     private static final int HEIGHT = 40;     // 图片高度
@@ -25,7 +25,7 @@ public class CaptchaUtil {
         // 1. 创建图片对象
         BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.getGraphics();
-        Random random = new Random();
+        SecureRandom random = new SecureRandom();
 
         // 2. 设置背景
         g.setColor(Color.WHITE);
