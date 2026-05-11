@@ -41,6 +41,15 @@
         <url-pattern>/api/captcha</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>ChangePwdServlet</servlet-name>
+        <servlet-class>com.sss.servlet.ChangePwdServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ChangePwdServlet</servlet-name>
+        <url-pattern>/changePwd</url-pattern>
+    </servlet-mapping>
+
     <!--LoginFilter 配置 -->
     <filter>
         <filter-name>LoginFilter</filter-name>

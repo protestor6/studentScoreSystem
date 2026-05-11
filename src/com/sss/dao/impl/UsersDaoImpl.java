@@ -112,4 +112,23 @@ public class UsersDaoImpl implements UsersDao {
             DBUtil.close(pstmt, conn);
         }
     }
+    
+    @Override
+    public boolean updatePassword(Users user) {
+        Connection conn = DBUtil.getConnection();
+        PreparedStatement pstmt = null;
+        String sql = "UPDATE users SET password = ? WHERE uno = ?";
+
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, user.getPassword());
+            pstmt.setString(2, user.getUno());
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            DBUtil.close(pstmt, conn);
+        }
+    }
 }

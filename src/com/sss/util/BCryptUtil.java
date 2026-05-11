@@ -30,7 +30,7 @@ public class BCryptUtil {
         // ======================
         // 在这里改你要加密的明文
         // ======================
-        String plain = "Yys77337";
+        String plain = "t0000004";
 
         // 生成密文
         String hashed = encrypt(plain);

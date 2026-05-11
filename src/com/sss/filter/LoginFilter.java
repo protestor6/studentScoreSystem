@@ -49,11 +49,14 @@ public class LoginFilter implements Filter {
         // 放行不需要登录的资源
         // ==============================================
         boolean isStatic = uri.contains("/css/") || uri.contains("/js/") || uri.contains("/img/");
+        boolean isLoginPage1 = uri.endsWith("login.html");
         boolean isLoginServlet = uri.endsWith("login");
         boolean isLogout = uri.endsWith("logout");
         boolean isCaptcha = uri.contains("captcha");
+        boolean isChangePwdPage = uri.endsWith("changePwd.html");
+        boolean isChangePwdServlet = uri.endsWith("changePwd");
 
-        if (isStatic || isLoginPage || isLoginServlet || isLogout || isCaptcha) {
+        if (isStatic || isLoginPage1 || isLoginServlet || isLogout || isCaptcha || isChangePwdPage || isChangePwdServlet) {
             chain.doFilter(request, response);
             return;
         }

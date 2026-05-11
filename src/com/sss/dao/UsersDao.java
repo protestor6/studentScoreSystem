@@ -24,4 +24,7 @@ public interface UsersDao {
 
     // 登录成功：清空错误次数、锁定状态
     public void resetLockInfo(String uno);
+    
+    //修改用户密码
+    public boolean updatePassword(Users user);
 }
