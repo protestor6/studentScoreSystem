@@ -41,7 +41,8 @@
         <servlet-name>CaptchaServlet</servlet-name>
         <url-pattern>/api/captcha</url-pattern>
     </servlet-mapping>
-
+    
+	<!-- ChangePwdServlet 配置 -->
     <servlet>
         <servlet-name>ChangePwdServlet</servlet-name>
         <servlet-class>com.sss.servlet.ChangePwdServlet</servlet-class>
@@ -50,7 +51,17 @@
         <servlet-name>ChangePwdServlet</servlet-name>
         <url-pattern>/changePwd</url-pattern>
     </servlet-mapping>
-
+    
+    <!-- GetCurrentUserServlet 配置 -->
+	<servlet>
+	    <servlet-name>GetCurrentUserServlet</servlet-name>
+	    <servlet-class>com.sss.servlet.GetCurrentUserServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>GetCurrentUserServlet</servlet-name>
+	    <url-pattern>/getCurrentUser</url-pattern>
+	</servlet-mapping>
+	
     <!--LoginFilter 配置 -->
     <filter>
         <filter-name>LoginFilter</filter-name>

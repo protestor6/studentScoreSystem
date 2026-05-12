@@ -1,0 +1,67 @@
+src/
+└── com/
+    └── sss/
+        ├── util/              # 工具类
+        ├── entity/            # 实体类（对应数据库表）
+        ├── dao/               # 数据访问层（查数据库）
+        ├── service/           # 业务逻辑层
+        ├── servlet/           # 控制器（接收前端请求）
+        └── filter/            # 过滤器（登录验证）
+
+二、每个包的文件清单（完全对应你的数据库）
+1. util 工具包
+DBUtil.java
+→ MySQL 连接、关闭、获取连接
+MD5Util.java（可选）
+→ 密码加密
+PageUtil.java（可选）
+→ 分页工具
+2. entity 实体包（每个类对应一张表）
+Department.java
+Major.java
+Class.java
+Student.java
+Teacher.java
+Course.java
+TeachCourse.java
+Score.java
+Admin.java
+Users.java
+MajorCourse.java
+3. dao 数据访问层（只和数据库打交道）
+StudentDao.java
+→ 查学生信息
+ScoreDao.java
+→ 成绩查询、学业统计（核心）
+CourseDao.java
+→ 查课程
+TeachCourseDao.java
+UsersDao.java
+→ 登录验证
+MajorCourseDao.java
+→ 按学期、专业查开课
+4. service 业务层（给 servlet 调用）
+StudentService.java
+ScoreService.java
+→ 成绩排序、升序 / 降序、NULL 处理
+→ 学业统计：总绩点、平均绩点、已修学分、未修学分、进度
+UserService.java
+→ 登录逻辑
+5. servlet 控制器（对接你的前端页面）
+登录模块
+LoginServlet.java
+→ 登录验证 → 跳转到 student.html
+成绩查询模块
+ScoreQueryServlet.java
+→ 接收：学期、课程名、课程编号、排序方式（降序 / 升序 / 不选）
+→ 返回成绩列表 JSON
+学业统计模块
+StudyStatServlet.java
+→ 返回：总绩点、平均绩点、已修学分、未修学分、学业进度、课程列表
+退出登录
+LogoutServlet.java
+→ 销毁 session → 回到 login.html
+6. filter 过滤器
+LoginFilter.java
+→ 未登录不能访问 student.html
+→ 强制跳回登录页

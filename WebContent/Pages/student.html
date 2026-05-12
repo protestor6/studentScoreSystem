@@ -255,7 +255,8 @@
                 <div class="top-bar-right">
                     <a href="javascript:void(0)" class="logout-link" onclick="confirmLogout()">退出登录</a>
                     <div class="user-avatar">👤</div>
-                    <div class="user-name">叶永盛</div>
+                    <!-- 把静态的用户名改成JS动态赋值 -->
+                    <div class="user-name" id="userName"></div>
                 </div>
             </div>
 
@@ -387,150 +388,79 @@
     </div>
 
     <script>
-        // 模拟成绩数据
-        const scoreData = [
-            { id: 1, term: "2025-2026-2", code: "CS301", name: "操作系统", score: 92, credit: 3, totalHour: 48, gpa: 4.0, examType: "考试", courseType: "专业核心课" },
-            { id: 2, term: "2025-2026-2", code: "CS302", name: "计算机网络", score: 85, credit: 3, totalHour: 48, gpa: 3.5, examType: "考试", courseType: "专业核心课" },
-            { id: 3, term: "2025-2026-2", code: "MA201", name: "概率论", score: 88, credit: 2, totalHour: 32, gpa: 3.7, examType: "考试", courseType: "公共基础课" }
-        ];
-
-        // 模拟从数据库读取的学业数据
-        const studentStudyData = {
-            totalGpa: 3.78,
-            avgGpa: 3.65,
-            completedCredits: 89,
-            uncompletedCredits: 21,
-            completedCourses: 81,
-            totalCourses: 100,
-            courseList: [
-                { id: 1, code: "CS101", name: "计算机基础", credit: 3, score: 92, gpa: 4.0, status: "已修", term: "2022-2023-1" },
-                { id: 2, code: "MA102", name: "高等数学(上)", credit: 4, score: 88, gpa: 3.7, status: "已修", term: "2022-2023-1" },
-                { id: 3, code: "EN101", name: "大学英语(一)", credit: 2, score: 85, gpa: 3.5, status: "已修", term: "2022-2023-1" },
-                { id: 4, code: "CS201", name: "数据结构", credit: 4, score: 90, gpa: 3.9, status: "已修", term: "2023-2024-1" },
-                { id: 5, code: "CS301", name: "操作系统", credit: 3, score: 0, gpa: 0, status: "未修", term: "2025-2026-2" },
-                { id: 6, code: "CS302", name: "计算机网络", credit: 3, score: 0, gpa: 0, status: "未修", term: "2025-2026-2" }
-            ]
-        };
-
-        // 页面加载时初始化
-        window.onload = function() {
-            initStatData();
-        };
-
-        // 处理排序复选框互斥逻辑
-        function handleSortCheckbox(checkbox) {
-            const descCheckbox = document.getElementById("sortDesc");
-            const ascCheckbox = document.getElementById("sortAsc");
-            
-            // 如果当前复选框被选中，取消另一个的选中状态
-            if (checkbox.checked) {
-                if (checkbox.id === "sortDesc") {
-                    ascCheckbox.checked = false;
-                } else {
-                    descCheckbox.checked = false;
-                }
-            }
-        }
-        
-		function confirmLogout() {
-		    if (confirm("确定要退出登录吗？")) {
-		        // 确认后再跳转
-		        window.location.href = "/studentScoreSystem/logout";
-		    }
+        // 删掉原来的 const scoreData = [...] 和 studentStudyData = [...] 这些测试数据
+// 删掉原来的 window.onload 里的 fetch 代码，改成下面这样
+		
+		window.onload = function() {
+		    // 初始化页面（只做静态的事情）
+		    initStatData();
+		};
+		
+		// 只在点击“查询”按钮时，才去调用后端接口
+		function queryScore() {
+		    const tableBody = document.getElementById("scoreTableBody");
+		    tableBody.innerHTML = "";
+		
+		    // 获取查询参数
+		    const term = document.querySelector(".form-item select").value;
+		    const courseName = document.querySelector(".form-item input:nth-child(2)").value;
+		    const courseCode = document.querySelector(".form-item input:nth-child(3)").value;
+		    let sort = "";
+		    const descChecked = document.getElementById("sortDesc").checked;
+		    const ascChecked = document.getElementById("sortAsc").checked;
+		    if (descChecked) sort = "desc";
+		    if (ascChecked) sort = "asc";
+		
+		    // 调用后端接口（用绝对路径，避免404）
+		    fetch("/studentScoreSystem/queryScore?term=" + encodeURIComponent(term) + "&courseName=" + encodeURIComponent(courseName) + "&courseCode=" + encodeURIComponent(courseCode) + "&sort=" + sort)
+		    .then(function(res) {
+		        return res.json();
+		    })
+		    .then(function(scoreList) {
+		        if (scoreList.length === 0) {
+		            tableBody.innerHTML = `<tr><td colspan="10" class="no-data">未查询到数据</td></tr>`;
+		            return;
+		        }
+		        // 动态渲染表格，序号从1开始自增
+		        scoreList.forEach(function(item, index) {
+		            const row = document.createElement("tr");
+		            row.innerHTML = 
+					    "<td>" + (index + 1) + "</td>" +
+					    "<td>" + item.semester + "</td>" +
+					    "<td>" + item.cno + "</td>" +
+					    "<td>" + item.cname + "</td>" +
+					    "<td>" + item.score + "</td>" +
+					    "<td>" + item.credit + "</td>" +
+					    "<td>" + item.period + "</td>" +
+					    "<td>" + item.gpa + "</td>" +
+					    "<td>" + item.testmethod + "</td>" +
+					    "<td>" + item.ctype + "</td>";
+		            tableBody.appendChild(row);
+		        });
+		    })
+		    .catch(function(err) {
+		        console.error("查询失败", err);
+		        tableBody.innerHTML = `<tr><td colspan="10" class="no-data">查询失败，请重试</td></tr>`;
+		    });
 		}
 		
-        // 成绩查询函数（含排序逻辑）
-        function queryScore() {
-            const tableBody = document.getElementById("scoreTableBody");
-            // 清空原有数据
-            tableBody.innerHTML = "";
-
-            // 获取排序方式（降序/升序/默认）
-            const descChecked = document.getElementById("sortDesc").checked;
-            const ascChecked = document.getElementById("sortAsc").checked;
-            
-            // 复制数据
-            let sortedData = [...scoreData];
-            
-            // 根据复选框状态排序
-            if (descChecked) {
-                // 降序：成绩高的在前
-                sortedData.sort((a, b) => b.score - a.score);
-            } else if (ascChecked) {
-                // 升序：成绩低的在前
-                sortedData.sort((a, b) => a.score - b.score);
-            }
-            // 都不选则使用原始默认顺序
-
-            // 填充表格
-            if (sortedData.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="10" class="no-data">未查询到数据</td></tr>`;
-                return;
-            }
-
-            sortedData.forEach((item, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${item.term}</td>
-                    <td>${item.code}</td>
-                    <td>${item.name}</td>
-                    <td>${item.score}</td>
-                    <td>${item.credit}</td>
-                    <td>${item.totalHour}</td>
-                    <td>${item.gpa}</td>
-                    <td>${item.examType}</td>
-                    <td>${item.courseType}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        // 初始化学业统计数据
-        function initStatData() {
-            document.getElementById("totalGpa").textContent = studentStudyData.totalGpa;
-            document.getElementById("avgGpa").textContent = studentStudyData.avgGpa;
-            document.getElementById("completedCredits").textContent = studentStudyData.completedCredits;
-            document.getElementById("uncompletedCredits").textContent = studentStudyData.uncompletedCredits;
-            const progressText = `${studentStudyData.completedCourses}/${studentStudyData.totalCourses} (${(studentStudyData.completedCourses/studentStudyData.totalCourses*100).toFixed(0)}%)`;
-            document.getElementById("studyProgress").textContent = progressText;
-
-            const tableBody = document.getElementById("statTableBody");
-            if (studentStudyData.courseList.length === 0) {
-                const emptyRow = document.createElement("tr");
-                emptyRow.innerHTML = `<td colspan="8" class="no-data">暂无学业统计数据</td>`;
-                tableBody.appendChild(emptyRow);
-                return;
-            }
-
-            studentStudyData.courseList.forEach(course => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${course.id}</td>
-                    <td>${course.code}</td>
-                    <td>${course.name}</td>
-                    <td>${course.credit}</td>
-                    <td>${course.score}</td>
-                    <td>${course.gpa}</td>
-                    <td>${course.status}</td>
-                    <td>${course.term}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        // 切换菜单
-        function switchTab(type) {
-            document.querySelectorAll('.menu-item').forEach((item, index) => {
-                if ((type === 'score' && index === 0) || (type === 'stat' && index === 1)) {
-                    item.classList.add('active');
-                } else {
-                    item.classList.remove('active');
-                }
-            });
-            document.getElementById('score-module').style.display = type === 'score' ? 'block' : 'none';
-            document.getElementById('stat-module').style.display = type === 'stat' ? 'block' : 'none';
-        }
+		// 初始化学业统计数据（这里可以先空着，或者用后端数据替换）
+		function initStatData() {
+		    // 等后面写学业统计接口后再实现，现在可以先注释掉
+		}
+		
+		// 切换菜单（已修复箭头函数兼容性问题）
+		function switchTab(type) {
+		    document.querySelectorAll('.menu-item').forEach(function(item, index) {
+		        if ((type === 'score' && index === 0) || (type === 'stat' && index === 1)) {
+		            item.classList.add('active');
+		        } else {
+		            item.classList.remove('active');
+		        }
+		    });
+		    document.getElementById('score-module').style.display = type === 'score' ? 'block' : 'none';
+		    document.getElementById('stat-module').style.display = type === 'stat' ? 'block' : 'none';
+		}
     </script>
 </body>
 </html>

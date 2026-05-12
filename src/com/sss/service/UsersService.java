@@ -13,4 +13,7 @@ public interface UsersService {
 
     // 登录成功：清空锁定和计数
     public void handleLoginSuccess(String uno);
+    
+    //通过uno获取用户姓名
+    public String getUname(String uno);
 }

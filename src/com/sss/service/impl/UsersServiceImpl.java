@@ -5,7 +5,9 @@ import java.util.Date;
 import org.mindrot.jbcrypt.BCrypt;
 import com.sss.dao.UsersDao;
 import com.sss.dao.impl.UsersDaoImpl;
+import com.sss.entity.UserType;
 import com.sss.entity.Users;
+import com.sss.service.StudentService;
 import com.sss.service.UsersService;
 
 public class UsersServiceImpl implements UsersService {
@@ -80,4 +82,16 @@ public class UsersServiceImpl implements UsersService {
     public void handleLoginSuccess(String uno) {
         usersDao.resetLockInfo(uno);
     }
+
+	@Override
+	public String getUname(String uno) {
+		Users user = usersDao.getUserByUno(uno);
+		if (user == null) return null;
+		
+		if(user.getUtype()==UserType.Ñ§Éú){
+			StudentService studentService = new StudentServiceImpl();
+			return studentService.getSname(uno);
+		}
+		return null;
+	}
 }
