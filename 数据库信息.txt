@@ -152,8 +152,13 @@ GRANT SELECT,INSERT,UPDATE,DELETE ON SSSdatabase.* TO 'user'@'%';
 -- 刷新权限生效
 FLUSH PRIVILEGES;
 
+-- 加索引
 -- 给总评成绩加索引，大幅提升排序速度
 CREATE INDEX idx_score_total_score ON score(total_score);
+-- 给学生学号建立索引，视图查询极速优化
+CREATE INDEX idx_student_sno ON student(sno);
+-- 额外：成绩表学号也加上，双重提速
+CREATE INDEX idx_score_sno ON score(sno);
 
 -- 插入测试数据：
 USE SSSdatabase;

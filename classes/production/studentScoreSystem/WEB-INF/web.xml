@@ -63,14 +63,14 @@
 	    <url-pattern>/getCurrentUser</url-pattern>
 	</servlet-mapping>
 	
-	<!-- ScoreQueryServlet 配置 -->
+	<!-- StudentScoreQueryServlet 配置 -->
 	<servlet>
-	    <servlet-name>ScoreQueryServlet</servlet-name>
-	    <servlet-class>com.sss.servlet.ScoreQueryServlet</servlet-class>
+	    <servlet-name>StudentScoreQueryServlet</servlet-name>
+	    <servlet-class>com.sss.servlet.StudentScoreQueryServlet</servlet-class>
 	</servlet>
 	<servlet-mapping>
-	    <servlet-name>ScoreQueryServlet</servlet-name>
-	    <url-pattern>/scoreQuery</url-pattern>
+	    <servlet-name>StudentScoreQueryServlet</servlet-name>
+	    <url-pattern>/studentScoreQuery</url-pattern>
 	</servlet-mapping>
 	
     <!--LoginFilter 配置 -->

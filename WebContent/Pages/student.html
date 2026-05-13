@@ -439,7 +439,7 @@
             const termDisplay = term === "" ? "所有学期" : term;
             document.getElementById("queryInfo").textContent = `查询条件: 学期【${termDisplay}】`;
 		    // 调用后端接口（用绝对路径，避免404）
-		    fetch("/studentScoreSystem/scoreQuery?term=" + encodeURIComponent(term) + "&courseName=" + encodeURIComponent(courseName) + "&courseCode=" + encodeURIComponent(courseCode) + "&sort=" + sort)
+		    fetch("/studentScoreSystem/studentScoreQuery?term=" + encodeURIComponent(term) + "&courseName=" + encodeURIComponent(courseName) + "&courseCode=" + encodeURIComponent(courseCode) + "&sort=" + sort)
 		    .then(function(res) {
 		        return res.json();
 		    })
