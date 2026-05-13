@@ -1,3 +1,4 @@
+//made by “∂”¿ ¢
 package com.sss.entity;
 
 public class StudentScoreDetail {

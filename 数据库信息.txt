@@ -2,15 +2,15 @@
 关系模式
 (1） 院系department（院系号deptno，院系名称deptname）
 (2） 专业major（专业号mno，专业名称mname，院系号deptno）
-(3） 班级class（班级号classno，班级名称classname，年级grade，专业号mno，辅导员idtno）
+(3） 班级 class（班级号 classno，班级名称 classname，年级 grade，专业号 mno，辅导员id tno）
 (4） 学生student（学号sno，姓名sname，性别sex，入学时间enroll_time，身份证号sid，班级号classno）
-(5） 教师teacher（教师编号tno，姓名tnane，性别sex，身份证号tid，职称title，院系号deptno，管理员编号admno）
+(5） 教师teacher（教师编号tno，姓名tname，性别sex，身份证号tid，职称title，院系号deptno，管理员编号admno）
 (6） 课程course（课程编号cno，课程名称cname，课程类型ctype，学分credit，学时period，考核形式testmethod）
-(7） 授课teach-course（授课idtcid，课程号cno，教师号tno，班级号classno）
-(8） 成绩score（成绩idscoreid，平时成绩usual_score，期末成绩exam_score，总评成绩total_score，成绩等级score_grade，绩点gpa，状态status，学号sno，授课idtcid）
+(7） 授课teach_course（授课id tcid，课程号cno，教师号tno，班级号classno）
+(8） 成绩score（成绩id scoreid，平时成绩usual_score，期末成绩exam_score，总评成绩total_score，成绩等级score_grade，绩点gpa，状态status，学号sno，授课id tcid）
 (9） 管理员admin（管理员编号admno，教师编号tno）
-(10）账号users（用户iduid，用户字段utype，密码password，用户编号uno，管理员编号admno）
-(11）课程-专业major-course（课程-专业idmcid，课程号cno，专业号mno，开课学期semester）
+(10）账号users（用户id uid，用户类型utype，密码password，用户编号uno，管理员编号admno，连续错误次数error_count，锁定开始时间lock_time，锁定时长lock_minutes，永久锁定is_permanent_lock）
+(11）课程-专业major_course（课程-专业id mcid，课程号cno，专业号mno，开课学期semester）
 
 相关mysql语句：
 # 建库
@@ -128,7 +128,7 @@ CREATE TABLE users (
     error_count INT DEFAULT 0,         -- 连续错误次数
     lock_time DATETIME NULL DEFAULT NULL,           -- 锁定开始时间
     lock_minutes INT DEFAULT 0,        -- 锁定时长（分钟）
-    is_permanent_lock TINYINT DEFAULT 0 -- 1=永久锁定 0=未永久锁定
+    is_permanent_lock TINYINT DEFAULT 0, -- 1=永久锁定 0=未永久锁定
     FOREIGN KEY (admno) REFERENCES admin(admno)
 ) COMMENT '账号信息表';
 
@@ -256,4 +256,40 @@ JOIN teach_course tc   ON sc.tcid = tc.tcid
 JOIN course c          ON tc.cno = c.cno
 JOIN student s         ON sc.sno = s.sno
 JOIN class cl          ON s.classno = cl.classno
-JOIN major_course mc   ON c.cno = mc.cno AND cl.mno = mc.mno; -- 关键修复！
+JOIN major_course mc   ON c.cno = mc.cno AND cl.mno = mc.mno; 
+
+-- 创建视图方便学业统计查询
+
+-- 新建学生统计总视图（包含：学号、专业号、总绩点、平均绩点、已修学分、专业总学分、未修学分）
+-- IFNULL(表达式，0)是指表达式是NULL时赋值为0，否则为其原本的值
+CREATE VIEW v_student_stat_detail AS
+SELECT
+    s.sno                 AS 学号,             -- 学生号
+    cl.mno                AS 专业号,             -- 专业号
+    IFNULL(SUM(sc.gpa), 0)          AS 个人总绩点,        -- 个人总绩点
+    IFNULL(SUM(sc.gpa * c.credit) / SUM(c.credit), 0.0)          AS 平均学分绩点,          -- 平均学分绩点
+    IFNULL(SUM(c.credit), 0)        AS 已修学分,-- 已修学分
+
+    -- 本专业应修总学分（动态从 major_course + course 计算）
+    (
+        SELECT IFNULL(SUM(c2.credit), 0)
+        FROM major_course mc2
+        JOIN course c2 ON mc2.cno = c2.cno
+        WHERE mc2.mno = cl.mno
+    )                       AS 总学分,     -- 总学分（动态）
+
+    -- 未修学分 = 总学分 - 已修学分
+    (
+        SELECT IFNULL(SUM(c2.credit), 0)
+        FROM major_course mc2
+        JOIN course c2 ON mc2.cno = c2.cno
+        WHERE mc2.mno = cl.mno
+    ) - IFNULL(SUM(c.credit), 0)  AS 未修学分 -- 未修学分
+
+FROM student s
+JOIN class cl ON s.classno = cl.classno
+LEFT JOIN score sc ON s.sno = sc.sno
+LEFT JOIN teach_course tc ON sc.tcid = tc.tcid
+LEFT JOIN course c ON tc.cno = c.cno
+
+GROUP BY s.sno, cl.mno;

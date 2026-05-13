@@ -72,7 +72,17 @@
 	    <servlet-name>StudentScoreQueryServlet</servlet-name>
 	    <url-pattern>/studentScoreQuery</url-pattern>
 	</servlet-mapping>
-	
+
+    <!-- StudentStatServlet 配置 -->
+    <servlet>
+        <servlet-name>StudentStatServlet</servlet-name>
+        <servlet-class>com.sss.servlet.StudentStatServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentStatServlet</servlet-name>
+        <url-pattern>/studentStat</url-pattern>
+    </servlet-mapping>
+
     <!--LoginFilter 配置 -->
     <filter>
         <filter-name>LoginFilter</filter-name>

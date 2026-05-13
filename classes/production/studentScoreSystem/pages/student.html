@@ -473,7 +473,40 @@
 		
 		// 初始化学业统计数据（这里可以先空着，或者用后端数据替换）
 		function initStatData() {
-		    // 等后面写学业统计接口后再实现，现在可以先注释掉
+            fetch("/studentScoreSystem/studentStat")
+                .then(res => res.json())
+                .then(data => {
+                    // 更新左侧统计数据
+                    document.getElementById("totalGpa").textContent = data.totalGpa.toFixed(2);
+                    document.getElementById("avgGpa").textContent = data.avgGpa.toFixed(2);
+                    document.getElementById("completedCredits").textContent = data.completedCredits;
+                    document.getElementById("uncompletedCredits").textContent = data.uncompletedCredits;
+                    document.getElementById("studyProgress").textContent = data.studyProgress;
+
+                    // 渲染右侧课程表格
+                    const tableBody = document.getElementById("statTableBody");
+                    tableBody.innerHTML = "";
+                    if (!data.courseList || data.courseList.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="8" class="no-data">暂无课程数据</td></tr>`;
+                        return;
+                    }
+                    data.courseList.forEach((course, index) => {
+                        const row = document.createElement("tr");
+                        row.innerHTML =
+                            `<td>${index + 1}</td>
+                <td>${course.cno}</td>
+                <td>${course.cname}</td>
+                <td>${course.credit}</td>
+                <td>${course.score}</td>
+                <td>${course.gpa}</td>
+                <td>已修</td>
+                <td>${course.semester}</td>`;
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(err => {
+                    console.error("加载学业统计失败", err);
+                });
 		}
 		
 		// 切换菜单（已修复箭头函数兼容性问题）
