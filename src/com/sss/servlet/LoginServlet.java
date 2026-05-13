@@ -56,8 +56,16 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 3. 校验账号密码
-        Users user = userService.login(uno, password);
+        // 3.看看用户是否存在
+        Users user = userService.getUserByUno(uno);
+        if(user == null){
+            String msg = URLEncoder.encode("该用户不存在！", "UTF-8");
+            response.sendRedirect("login.html?Msg=" + msg);
+            return;
+        }
+
+        // 4. 校验账号密码
+        user = userService.login(uno, password);
         if (user == null) {
             // 账号密码错误：触发计数和锁定
             userService.handleLoginFail(uno);
@@ -75,7 +83,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // 4. 登录成功：清空错误计数和锁定状态
+        // 5. 登录成功：清空错误计数和锁定状态
         userService.handleLoginSuccess(uno);
         session.removeAttribute("captchaCode");
         session.setAttribute("loginUser", user);

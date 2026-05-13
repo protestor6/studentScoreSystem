@@ -231,35 +231,24 @@ INSERT INTO major_course (cno, mno, semester) VALUES
 -- 创建视图方便学生成绩查询
 CREATE VIEW v_student_score_detail AS
 SELECT 
-    -- 1. 核心：加学生学号sno（用于后端筛选）
-    s.sno AS '学号',
-    s.sname AS '学生姓名', -- 可选，方便调试
-    
-    -- 2. 原有字段（原样保留）
-    mc.semester AS '开课学期',
-    c.cno AS '课程编号',
-    c.cname AS '课程名称',
-    
-    -- 成绩逻辑（原样保留）
+    s.sno             AS 学号,
+    s.sname           AS 学生姓名,
+    mc.semester       AS 开课学期,
+    c.cno             AS 课程编号,
+    c.cname           AS 课程名称,
     CASE 
         WHEN c.testmethod = '考试' THEN sc.total_score
-        WHEN c.testmethod = '考查' THEN sc.score_grade
+        WHEN c.testmethod = '考察' THEN sc.score_grade
         ELSE '无成绩'
-    END AS '成绩',
-    
-    c.credit AS '学分',
-    c.period AS '总学时',
-    sc.gpa AS '绩点',
-    c.testmethod AS '考核方式',
-    c.ctype AS '课程类型'
-
--- 3. 关联所有表（核心：把student、users加进JOIN链条）
+    END               AS 成绩,
+    c.credit          AS 学分,
+    c.period          AS 总学时,
+    sc.gpa            AS 绩点,
+    c.testmethod      AS 考核方式,
+    c.ctype           AS 课程类型
 FROM score sc
--- 成绩表关联授课表
-JOIN teach_course tc ON sc.tcid = tc.tcid
--- 授课表关联课程表
-JOIN course c ON tc.cno = c.cno
--- 课程表关联专业-课程表
-JOIN major_course mc ON c.cno = mc.cno
--- 成绩表关联学生表（关键：通过sno关联）
-JOIN student s ON sc.sno = s.sno;
+JOIN teach_course tc   ON sc.tcid = tc.tcid
+JOIN course c          ON tc.cno = c.cno
+JOIN student s         ON sc.sno = s.sno
+JOIN class cl          ON s.classno = cl.classno
+JOIN major_course mc   ON c.cno = mc.cno AND cl.mno = mc.mno; -- 关键修复！

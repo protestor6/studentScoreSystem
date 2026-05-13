@@ -269,11 +269,12 @@
                         <!-- 学期下拉框（逆序排列：最新→最旧） -->
                         <div class="form-item">
                             <label>学期</label>
-                            <select>
+                            <select id="termSelect">
+                                <option value="">所有学期</option>
                                 <option>2026-2027-2</option>
                                 <option>2026-2027-1</option>
-                                <option>2025-2026-1</option>
                                 <option selected>2025-2026-2</option>
+                                <option>2025-2026-1</option>
                                 <option>2024-2025-2</option>
                                 <option>2024-2025-1</option>
                                 <option>2023-2024-2</option>
@@ -285,12 +286,12 @@
                         <!-- 课程名称输入框 -->
                         <div class="form-item">
                             <label>课程名称</label>
-                            <input type="text" placeholder="请输入课程名称">
+                            <input type="text" id="courseNameInput" placeholder="请输入课程名称">
                         </div>
                         <!-- 课程编号输入框 -->
                         <div class="form-item">
                             <label>课程编号</label>
-                            <input type="text" placeholder="请输入课程编号">
+                            <input type="text" id="courseCodeInput" placeholder="请输入课程编号">
                         </div>
                         <!-- 新增：排序复选框组（互斥） -->
                         <div class="sort-checkbox-group">
@@ -304,11 +305,11 @@
                             </div>
                         </div>
                         <div class="btn-group">
-                            <button class="btn btn-search" onclick="queryScore()">查询</button>
+                            <button class="btn btn-search" onclick="scoreQuery()">查询</button>
                         </div>
                     </div>
                     <div class="table-area">
-                        <div class="table-info">查询条件: 学期【2025-2026-2】</div>
+                        <div class="table-info" id="queryInfo">查询条件: 学期【2025-2026-2】</div>
                         <table class="result-table">
                             <thead>
                                 <tr>
@@ -392,27 +393,53 @@
 // 删掉原来的 window.onload 里的 fetch 代码，改成下面这样
 		
 		window.onload = function() {
-		    // 初始化页面（只做静态的事情）
-		    initStatData();
+            // 初始化页面
+            initStatData();
+            // 获取当前登录用户，显示用户名
+            fetch("/studentScoreSystem/getCurrentUser")
+                .then(res => res.json())
+                .then(user => {
+                    if (user && user.name) {
+                        document.getElementById("userName").textContent = user.name;
+                    }
+                });
 		};
-		
+        // 退出登录函数
+        function confirmLogout() {
+            if (confirm("确定要退出登录吗？")) {
+                // 跳转到退出Servlet，清空session
+                window.location.href = "/studentScoreSystem/logout";
+            }
+        }
+        // 排序复选框互斥处理
+        function handleSortCheckbox(checkbox) {
+            const descCheckbox = document.getElementById("sortDesc");
+            const ascCheckbox = document.getElementById("sortAsc");
+            if (checkbox.id === "sortDesc" && checkbox.checked) {
+                ascCheckbox.checked = false;
+            } else if (checkbox.id === "sortAsc" && checkbox.checked) {
+                descCheckbox.checked = false;
+            }
+        }
 		// 只在点击“查询”按钮时，才去调用后端接口
-		function queryScore() {
+		function scoreQuery() {
 		    const tableBody = document.getElementById("scoreTableBody");
 		    tableBody.innerHTML = "";
 		
 		    // 获取查询参数
-		    const term = document.querySelector(".form-item select").value;
-		    const courseName = document.querySelector(".form-item input:nth-child(2)").value;
-		    const courseCode = document.querySelector(".form-item input:nth-child(3)").value;
+            const term = document.getElementById("termSelect").value;
+            const courseName = document.getElementById("courseNameInput").value;
+            const courseCode = document.getElementById("courseCodeInput").value;
 		    let sort = "";
 		    const descChecked = document.getElementById("sortDesc").checked;
 		    const ascChecked = document.getElementById("sortAsc").checked;
 		    if (descChecked) sort = "desc";
 		    if (ascChecked) sort = "asc";
-		
+
+            const termDisplay = term === "" ? "所有学期" : term;
+            document.getElementById("queryInfo").textContent = `查询条件: 学期【${termDisplay}】`;
 		    // 调用后端接口（用绝对路径，避免404）
-		    fetch("/studentScoreSystem/queryScore?term=" + encodeURIComponent(term) + "&courseName=" + encodeURIComponent(courseName) + "&courseCode=" + encodeURIComponent(courseCode) + "&sort=" + sort)
+		    fetch("/studentScoreSystem/scoreQuery?term=" + encodeURIComponent(term) + "&courseName=" + encodeURIComponent(courseName) + "&courseCode=" + encodeURIComponent(courseCode) + "&sort=" + sort)
 		    .then(function(res) {
 		        return res.json();
 		    })

@@ -13,6 +13,11 @@ import com.sss.service.UsersService;
 public class UsersServiceImpl implements UsersService {
     private UsersDao usersDao = new UsersDaoImpl();
 
+    @Override
+    public Users getUserByUno(String uno) {
+        return usersDao.getUserByUno(uno);
+    }
+
     public Users login(String uno, String password) {
         Users user = usersDao.getUserByUno(uno);
 

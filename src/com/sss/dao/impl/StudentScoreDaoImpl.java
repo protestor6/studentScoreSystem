@@ -22,27 +22,27 @@ public class StudentScoreDaoImpl implements StudentScoreDao {
             conn = DBUtil.getConnection();
             // 你的视图名为 v_student_score_detail
             StringBuilder sql = new StringBuilder("SELECT * FROM " +
-            		"v_student_score_detail WHERE uno = ?");
+            		"v_student_score_detail WHERE 学号 = ?");
 
             // 拼接筛选条件
             if (term != null && !term.trim().isEmpty()) {
-                sql.append(" AND term = ?");
+                sql.append(" AND 开课学期 = ?");
             }
             if (courseName != null && !courseName.trim().isEmpty()) {
-                sql.append(" AND course_name LIKE ?");
+                sql.append(" AND 课程名称 LIKE ?");
             }
             if (courseCode != null && !courseCode.trim().isEmpty()) {
-                sql.append(" AND course_code LIKE ?");
+                sql.append(" AND 课程编号 LIKE ?");
             }
 
             // 拼接排序条件（关键：升序/降序）
             if ("desc".equals(sort)) {
-                sql.append(" ORDER BY score DESC");
+                sql.append(" ORDER BY 成绩 DESC");
             } else if ("asc".equals(sort)) {
-                sql.append(" ORDER BY score ASC");
+                sql.append(" ORDER BY 成绩 ASC");
             } else {
                 // 默认按学期+课程号排序
-                sql.append(" ORDER BY term DESC, course_code");
+                sql.append(" ORDER BY 成绩 DESC, 课程编号");
             }
 
             pstmt = conn.prepareStatement(sql.toString());

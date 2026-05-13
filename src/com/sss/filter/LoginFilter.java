@@ -27,9 +27,10 @@ public class LoginFilter implements Filter {
         // ==============================================
         boolean isRootPath = uri.equals(ctx + "/");
         boolean isLoginPage = uri.endsWith("login.html");
+        boolean isChangePwdPage = uri.endsWith("changePwd.html");
 
         if (loginUser != null) {
-            if (isRootPath || isLoginPage) {
+            if (isRootPath || isLoginPage || isChangePwdPage) {
             	if(loginUser.getUtype()==UserType.Ñ§Éú)
                 	response.sendRedirect(ctx + "/pages/student.html");
                 return;
@@ -54,10 +55,10 @@ public class LoginFilter implements Filter {
         boolean isLoginServlet = uri.endsWith("login");
         boolean isLogout = uri.endsWith("logout");
         boolean isCaptcha = uri.contains("captcha");
-        boolean isChangePwdPage = uri.endsWith("changePwd.html");
+        boolean isChangePwdPage1 = uri.endsWith("changePwd.html");
         boolean isChangePwdServlet = uri.endsWith("changePwd");
 
-        if (isStatic || isLoginPage1 || isLoginServlet || isLogout || isCaptcha || isChangePwdPage || isChangePwdServlet) {
+        if (isStatic || isLoginPage1 || isLoginServlet || isLogout || isCaptcha || isChangePwdPage1 || isChangePwdServlet) {
             chain.doFilter(request, response);
             return;
         }

@@ -4,6 +4,9 @@ package com.sss.service;
 import com.sss.entity.Users;
 
 public interface UsersService {
+    // 看看用户是否存在
+    public Users getUserByUno(String uno);
+    // 登录
 	public Users login(String uno, String password);
 	// 检查账号是否被锁定：返回null=正常，返回提示文案=已锁定
     public String checkAccountLock(String uno);
