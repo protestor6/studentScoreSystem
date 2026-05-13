@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 public class DBUtil {
     // 数据库连接参数（改成你自己的MySQL账号密码）
-    private static final String DRIVER = "com.mysql.jdbc.Driver";
+    private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
     // 适配utf8mb4的URL（核心修改）
     private static final String URL = "jdbc:mysql://localhost:3306/SSSdatabase?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8";
     private static final String USER = "user";  // 你的MySQL用户名（默认root）
